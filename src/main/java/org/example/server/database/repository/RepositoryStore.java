@@ -1,5 +1,7 @@
 package org.example.server.database.repository;
 
+import org.example.server.database.repository.proxy.RepositoryProxy;
+
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.example.server.database.repository;
+package org.example.server.database.repository.proxy;
 
 import org.example.server.database.Database;
 import org.example.server.database.annotation.NoResult;
@@ -7,7 +7,6 @@ import org.example.server.database.annotation.ResultParser;
 import org.example.server.database.exception.AnnotationMissedException;
 import org.example.server.database.repository.parser.ModelParser;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class RepositoryProxy implements InvocationHandler {
+public class RepositoryProxy extends BaseProxy {
     private final Database database;
 
     public RepositoryProxy() {
@@ -24,9 +23,15 @@ public class RepositoryProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Query query = method.getAnnotation(Query.class);
+        Object result = super.invoke(proxy, method, args);
+        if (result != null) return result;
 
-        if (query == null) throw new AnnotationMissedException(Query.class);
+        return invokeQuery(method, args);
+    }
+
+
+    private Object invokeQuery(Method method, Object[] args) throws Throwable {
+        Query query = method.getAnnotation(Query.class);
 
         ResultSet resultSet = executeQuery(query.value(), args);
 
