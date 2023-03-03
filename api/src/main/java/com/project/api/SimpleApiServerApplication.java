@@ -1,5 +1,6 @@
 package com.project.api;
 
+import com.project.api.controller.MainController;
 import com.project.api.data.model.Post;
 import com.project.api.data.model.User;
 import com.project.api.data.repository.PostRepository;
@@ -8,12 +9,26 @@ import com.project.server.database.ConnectionInfo;
 import com.project.server.database.Database;
 import com.project.server.database.loader.DatabasePropertyLoader;
 import com.project.server.database.repository.RepositoryStore;
+import com.sun.net.httpserver.HttpServer;
+import org.project.server.handler.ControllerHttpHandler;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public class SimpleApiServerApplication {
     public static void main(String[] args) throws IOException {
+        HttpServer httpServer = HttpServer.create();
+
+        httpServer.bind(new InetSocketAddress("localhost", 8080), 0);
+
+        httpServer.createContext("/main", new ControllerHttpHandler<>("/main", new MainController()));
+
+        httpServer.start();
+    }
+
+
+    public static void main2(String[] args) throws IOException {
         ConnectionInfo info = DatabasePropertyLoader.loadFromResource("database.yml");
 
         Database.initialize(info);
