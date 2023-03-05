@@ -9,22 +9,23 @@ import com.project.server.database.ConnectionInfo;
 import com.project.server.database.Database;
 import com.project.server.database.loader.DatabasePropertyLoader;
 import com.project.server.database.repository.RepositoryStore;
-import com.sun.net.httpserver.HttpServer;
-import org.project.server.handler.ControllerHttpHandler;
+import org.project.server.AutomaticUltraMegaXXXDoubleBassBoostAnnihilationHttpServer;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.List;
 
 public class SimpleApiServerApplication {
     public static void main(String[] args) throws IOException {
-        HttpServer httpServer = HttpServer.create();
+        AutomaticUltraMegaXXXDoubleBassBoostAnnihilationHttpServer server =
+                new AutomaticUltraMegaXXXDoubleBassBoostAnnihilationHttpServer(8080, "localhost");
 
-        httpServer.bind(new InetSocketAddress("localhost", 8080), 0);
+        server.registerController(new MainController());
 
-        httpServer.createContext("/main", new ControllerHttpHandler<>("/main", new MainController()));
+        server.addExceptionHandler(NullPointerException.class, e -> {
+            return "Something went wrong. Null pointer exception thrown.";
+        });
 
-        httpServer.start();
+        server.start();
     }
 
 

@@ -1,5 +1,7 @@
 package org.project.server.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,28 +12,40 @@ import java.util.regex.Pattern;
 public class UrlUtils {
     private static final Pattern pathPattern = Pattern.compile("\\{(.*)?}");
 
-    public static Map<String, String> getPathVariables(String url1, String url2) {
-        List<String> url1Parts = getUrlParts(url1);
-        List<String> url2Parts = getUrlParts(url2);
+    /**
+     * Retrieve path params by regex {@link #pathPattern}
+     *
+     * @param sample Route path with placeholders
+     * @param source Data path with data
+     * @return Map of path params
+     */
+    public static Map<String, String> retrievePathVariables(@NotNull String sample, @NotNull String source) {
+        List<String> sampleParts = getUrlParts(sample);
+        List<String> sourceParts = getUrlParts(source);
 
         Map<String, String> result = new HashMap<>();
 
-        int size = url1Parts.size();
+        int size = sampleParts.size();
 
         for (int i = 0; i < size; i++) {
-            String url1Part = url1Parts.get(i);
-            String url2Part = url2Parts.get(i);
+            String samplePart = sampleParts.get(i);
+            String sourcePart = sourceParts.get(i);
 
-            Matcher matcher = pathPattern.matcher(url1Part);
+            Matcher matcher = pathPattern.matcher(samplePart);
             if (matcher.matches()) {
-                result.put(url1Part.substring(1, url1Part.length() - 1), url2Part);
+                result.put(samplePart.substring(1, samplePart.length() - 1), sourcePart);
             }
         }
 
         return result;
     }
 
-    public static boolean isUrlSameIgnorePathParams(String url1, String url2) {
+    /**
+     * Tests two routes for equality, ignoring path parameters
+     *
+     * @return URLs equality
+     */
+    public static boolean isUrlSameIgnorePathParams(@NotNull String url1, @NotNull String url2) {
         List<String> url1Parts = getUrlParts(url1);
         List<String> url2Parts = getUrlParts(url2);
 
@@ -50,11 +64,11 @@ public class UrlUtils {
         return true;
     }
 
-    public static boolean isUrlValid(String url) {
+    public static boolean isUrlPathValid(@NotNull String url) {
         return !url.contains("//");
     }
 
-    private static List<String> getUrlParts(String url) {
+    public static List<String> getUrlParts(@NotNull String url) {
         return Arrays.stream(url.split("/")).filter(s -> !s.isBlank()).toList();
     }
 }
